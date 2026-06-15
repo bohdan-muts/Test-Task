@@ -1,0 +1,358 @@
+{%- if section.blocks.size > 0 -%}
+  {%- liquid
+    assign background_color = section.settings.background_color
+    assign text_color = section.settings.text_color
+    assign heading_color = section.settings.heading_color
+    assign border_color = section.settings.border_color
+    assign border_color_active = section.settings.border_color_active
+    assign container_width = section.settings.container_width
+    assign card_width = section.settings.card_width
+    assign heading_color_active = section.settings.heading_color_active
+    assign price_background_color = section.settings.price_background_color
+    assign price_sale_color = section.settings.price_sale_color
+    assign card_position = section.settings.card_position
+    assign card_position_mobile = section.settings.card_position_mobile
+  -%}
+
+  {{ 'section-best-sellers.css' | asset_url | stylesheet_tag }}
+
+  {% render 'section-paddings',
+    padding_top: section.settings.padding_top,
+    padding_bottom: section.settings.padding_bottom,
+    padding_top_mobile: section.settings.padding_top_mobile,
+    padding_bottom_mobile: section.settings.padding_bottom_mobile
+  %}
+
+  <best-sellers-section
+    class="best-sellers section-{{ section.id }}--padding"
+    style="
+      --background-color: {{ background_color }};
+      --text-color: {{ text_color }};
+      --heading-color: {{ heading_color }};
+      --heading-color-active: {{ heading_color_active }};
+      --border-color: {{ border_color }};
+      --border-color-active: {{ border_color_active }};
+      --container-width: {{ container_width }}px;
+      --card-width: {{ card_width }}px;
+      --price-sale-color: {{ price_sale_color }};
+      --price-background-color: {{ price_background_color }};
+      --card-position: {{ card_position }};
+      --card-position-mobile: {{ card_position_mobile }};
+    "
+  >
+    <div class="best-sellers__container page-width">
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign collection = block.settings.coll
+          assign limit = block.settings.max_products | default: 3
+          assign override_product = block.settings.override_product
+          assign collection_title = block.settings.collection_title | strip
+
+          if collection_title == blank and collection != blank
+            assign collection_title = collection.title
+          endif
+          assign collection_caption = block.settings.caption
+        -%}
+
+        {%- if collection != blank -%}
+          <div class="best-sellers__wrapper" {{ block.shopify_attributes }}>
+            <nav class="best-sellers__navigation">
+              {%- if collection_caption != blank or collection_title != blank -%}
+                <div class="best-sellers__navigation-header">
+                  {%- if collection_caption != blank -%}
+                    <p class="best-sellers__navigation-caption">{{ collection_caption }}</p>
+                  {%- endif -%}
+                  {%- if collection_title != blank -%}
+                    <h3 class="best-sellers__navigation-title">{{ collection_title }}</h3>
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+
+              <div class="best-sellers__products-list">
+                {%- assign rendered_count = 0 -%}
+                {%- if override_product != blank -%}
+                  <button class="best-sellers__product-tab is-active" data-js-trigger="{{ override_product.id }}" type="button">
+                    {{ override_product.title }}
+                    {% render 'icons', name: 'arrow' %}
+                  </button>
+                  {%- assign rendered_count = 1 -%}
+                {%- endif -%}
+
+                {%- for product in collection.products -%}
+                  {%- if product.id != override_product.id and rendered_count < limit -%}
+                    <button class="best-sellers__product-tab {% if override_product == blank and rendered_count == 0 %}is-active{% endif %}" data-js-trigger="{{ product.id }}" type="button">
+                      {{ product.title }}
+                      {% render 'icons', name: 'arrow' %}
+                    </button>
+                    {%- assign rendered_count = rendered_count | plus: 1 -%}
+                  {%- endif -%}
+                {%- endfor -%}
+              </div>
+            </nav>
+
+            <div class="best-sellers__display">
+              {%- assign rendered_count = 0 -%}
+              {%- if override_product != blank -%}
+                <div class="best-sellers__card-wrap is-active" data-js-id="{{ override_product.id }}">
+                  {% render 'best-sellers-card', product: override_product, size: card_width %}
+                </div>
+                {%- assign rendered_count = 1 -%}
+              {%- endif -%}
+
+              {%- for product in collection.products -%}
+                {%- if product.id != override_product.id and rendered_count < limit -%}
+                  <div class="best-sellers__card-wrap {% if override_product == blank and rendered_count == 0 %}is-active{% endif %}" data-js-id="{{ product.id }}">
+                    {% render 'best-sellers-card', product: product %}
+                  </div>
+                  {%- assign rendered_count = rendered_count | plus: 1 -%}
+                {%- endif -%}
+              {%- endfor -%}
+            </div>
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+    {% render 'wishlist-popup' %}
+  </best-sellers-section>
+
+  <script src="{{ 'section-best-sellers.js' | asset_url }}" defer="defer"></script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Best Sellers",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "container_width",
+      "min": 1000,
+      "max": 1720,
+      "step": 20,
+      "default": 1680,
+      "label": "Container Width"
+    },
+    {
+      "type": "select",
+      "id": "card_position",
+      "label": "Card Position",
+      "options": [
+        {
+          "value": "row-reverse",
+          "label": "Left"
+        },
+        {
+          "value": "row",
+          "label": "Right"
+        }
+      ],
+      "default": "row"
+    },
+    {
+      "type": "select",
+      "id": "card_position_mobile",
+      "label": "Card Position (Mobile)",
+      "options": [
+        {
+          "value": "column-reverse",
+          "label": "Top"
+        },
+        {
+          "value": "column",
+          "label": "Bottom"
+        }
+      ],
+      "default": "column"
+    },
+    {
+      "type": "select",
+      "id": "card_width",
+      "label": "Card Width",
+      "options": [
+        {
+          "value": "400",
+          "label": "Small"
+        },
+        {
+          "value": "600",
+          "label": "Medium"
+        },
+        {
+          "value": "816",
+          "label": "Large"
+        }
+      ],
+      "default": "816"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "heading_color_active",
+      "label": "Active Heading Color",
+      "default": "#9D9D9D"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border Color",
+      "default": "#DCDCDC"
+    },
+    {
+      "type": "color",
+      "id": "border_color_active",
+      "label": "Active Border Color",
+      "default": "#292929"
+    },
+    {
+      "type": "color",
+      "id": "price_sale_color",
+      "label": "Sale Price Color",
+      "default": "#E41616"
+    },
+    {
+      "type": "color",
+      "id": "price_background_color",
+      "label": "Price Background Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Paddings"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 40,
+      "unit": "px",
+      "label": "Padding Top"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 40,
+      "unit": "px",
+      "label": "Padding Bottom"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 20,
+      "unit": "px",
+      "label": "Padding Top (Mobile)"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 20,
+      "unit": "px",
+      "label": "Padding Bottom (Mobile)"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection",
+      "name": "Collection",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "coll",
+          "label": "Collection"
+        },
+        {
+          "type": "product",
+          "id": "override_product",
+          "label": "Replace First Product"
+        },
+        {
+          "type": "range",
+          "id": "max_products",
+          "min": 1,
+          "max": 3,
+          "step": 1,
+          "default": 3,
+          "label": "Max Products To Display"
+        },
+        {
+          "type": "text",
+          "id": "caption",
+          "label": "Caption"
+        },
+        {
+          "type": "text",
+          "id": "collection_title",
+          "label": "Collection Title (override)"
+        },
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Best Sellers",
+      "settings": {
+        "container_width": 1680,
+        "card_width": "816",
+        "background_color": "#ffffff",
+        "text_color": "#000000",
+        "heading_color": "#000000",
+        "heading_color_active": "#9D9D9D",
+        "border_color": "#DCDCDC",
+        "border_color_active": "#292929",
+        "price_sale_color": "#E41616",
+        "price_background_color": "#ffffff",
+        "padding_top": 40,
+        "padding_bottom": 40,
+        "padding_top_mobile": 20,
+        "padding_bottom_mobile": 20
+      },
+      "blocks": [
+        {
+          "type": "collection",
+          "settings": {
+            "max_products": 3,
+            "caption": "Our Selection",
+            "collection_title": "Top Products"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

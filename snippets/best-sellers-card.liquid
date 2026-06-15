@@ -1,0 +1,59 @@
+{%- if product != blank -%}
+  <div class="product-card">
+    <div class="product-card__media">
+      <a href="{{ product.url | default: '#' }}" class="product-card__media-link">
+        {%- if product.featured_image != blank -%}
+          <picture>
+            <source media="(max-width: 767px)" srcset="{{ product.featured_image | image_url: width: 375 }} 1x, {{ product.featured_image | image_url: width: 750 }} 2x">
+            {{ product.featured_image | image_url: width: 800 | image_tag: loading: 'lazy', class: 'product-card__img' }}
+          </picture>
+        {%- else -%}
+          {{ 'product-1' | placeholder_svg_tag: 'product-card__img product-card__placeholder' }}
+        {%- endif -%}
+      </a>
+
+      {%- assign badges = product.metafields.custom.product_badges.value -%}
+      {%- if badges != blank -%}
+        <div class="product-card__tags">
+          {%- for badge in badges -%}
+            {%- if badge.text != blank -%}
+              <span class="product-card__tag" style="--badge-background-color: {{ badge.color }}; --badge-text-color: {{ badge.text_color }};">
+                {{ badge.text }}
+              </span>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+
+      {%- if product.title != blank or product.selected_or_first_available_variant.id != blank -%}
+        <div class="product-card__actions">
+          <button class="product-card__action product-card__wish" data-js-open-popup data-product-name="{{ product.title | escape }}">
+            {% render 'icons', name: 'heart' %}
+          </button>
+          <button class="product-card__action product-card__cart" data-js-add-to-cart data-variant-id="{{ product.selected_or_first_available_variant.id }}" {% unless product.available %}disabled{% endunless %}>
+            {% render 'icons', name: 'eye' %}
+          </button>
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- if product.title != blank or product.price != blank -%}
+      <a href="{{ product.url }}" class="product-card__media-link">
+        <div class="product-card__footer">
+          {%- if product.title != blank -%}
+            <span class="product-card__name">{{ product.title }}</span>
+          {%- endif -%}
+          
+          <div class="product-card__price-wrapper">
+            {%- if product.compare_at_price > product.price -%}
+              <span class="product-card__sale-price">{{ product.price | money }}</span>
+              <s class="product-card__compare-price">{{ product.compare_at_price | money }}</s>
+            {%- else -%}
+              <span class="product-card__price">{{ product.price | money }}</span>
+            {%- endif -%}
+          </div>
+        </div>
+      </a>
+    {%- endif -%}
+  </div>
+{%- endif -%}

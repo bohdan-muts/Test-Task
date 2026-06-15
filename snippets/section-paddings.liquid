@@ -1,0 +1,20 @@
+{%- liquid
+  assign padding_top = padding_top | append: 'px'
+  assign padding_bottom = padding_bottom | append: 'px'
+  assign padding_top_mobile = padding_top_mobile | default: padding_top | append: 'px'
+  assign padding_bottom_mobile = padding_bottom_mobile | default: padding_bottom | append: 'px'
+-%}
+
+{%- style -%}
+  .section-{{ section.id }}--padding {
+    padding-top: {{ padding_top_mobile }};
+    padding-bottom: {{ padding_bottom_mobile }};
+  }
+
+  @media(max-width: 768px) {
+    .section-{{ section.id }}--padding {
+      padding-top: {{ padding_top }};
+      padding-bottom: {{ padding_bottom }};
+    }
+  }
+{%- endstyle -%}
