@@ -28,8 +28,13 @@
       ],
       "name": "Best sellers",
       "settings": {
+        "section_caption": "Section Caption",
+        "section_title": "Section Title",
+        "text_align": "left",
         "container_width": 1720,
-        "card_width": "400",
+        "card_position": "row",
+        "card_position_mobile": "column",
+        "card_width": "816",
         "background_color": "#ffffff",
         "text_color": "#535353",
         "heading_color": "#9d9d9d",
@@ -38,10 +43,10 @@
         "border_color_active": "#292929",
         "price_sale_color": "#e41616",
         "price_background_color": "#ffffff",
-        "padding_top": 40,
-        "padding_bottom": 40,
-        "padding_top_mobile": 20,
-        "padding_bottom_mobile": 20
+        "padding_top": 44,
+        "padding_bottom": 32,
+        "padding_top_mobile": 100,
+        "padding_bottom_mobile": 100
       }
     }
   },

@@ -1,5 +1,8 @@
 {%- if section.blocks.size > 0 -%}
   {%- liquid
+    assign section_caption = section.settings.section_caption
+    assign section_title = section.settings.section_title
+    assign text_align = section.settings.text_align
     assign background_color = section.settings.background_color
     assign text_color = section.settings.text_color
     assign heading_color = section.settings.heading_color
@@ -28,6 +31,7 @@
     style="
       --background-color: {{ background_color }};
       --text-color: {{ text_color }};
+      --text-align: {{ text_align }};
       --heading-color: {{ heading_color }};
       --heading-color-active: {{ heading_color_active }};
       --border-color: {{ border_color }};
@@ -41,6 +45,17 @@
     "
   >
     <div class="best-sellers__container page-width">
+      {%- if section_caption != blank or section_title != blank -%}
+        <div class="best-sellers__header" style="--text-align: {{ text_align }};">
+          {%- if section_caption != blank -%}
+            <p class="best-sellers__header-caption">{{ section_caption }}</p>
+          {%- endif -%}
+          {%- if section_title != blank -%}
+            <h2 class="best-sellers__header-title">{{ section_title }}</h2>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
       {%- for block in section.blocks -%}
         {%- liquid
           assign collection = block.settings.coll
@@ -124,6 +139,26 @@
   "name": "Best Sellers",
   "tag": "section",
   "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "section_caption",
+      "label": "Section Caption"
+    },
+    {
+      "type": "text",
+      "id": "section_title",
+      "label": "Section Title"
+    },
+    {
+      "type": "text_alignment",
+      "id": "text_align",
+      "label": "Heading Align",
+      "default": "left"
+    },
     {
       "type": "header",
       "content": "Layout"
@@ -319,7 +354,7 @@
           "type": "text",
           "id": "collection_title",
           "label": "Collection Title (override)"
-        },
+        }
       ]
     }
   ],
